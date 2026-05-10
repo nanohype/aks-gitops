@@ -1,0 +1,23 @@
+# Pulls the Azure Managed Grafana service-account token from Azure Key Vault
+# and materializes it as a Secret named grafana-external-credentials. The
+# Grafana CR below references it as the apiKey for managed Grafana.
+#
+# The KV secret `aks-grafana-token` must be a JSON document with key `token`,
+# populated from `az grafana service-account token create`.
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: grafana-external-credentials
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: azure-key-vault
+    kind: ClusterSecretStore
+  target:
+    name: grafana-external-credentials
+    creationPolicy: Owner
+  data:
+    - secretKey: token
+      remoteRef:
+        key: aks-grafana-token
+        property: token

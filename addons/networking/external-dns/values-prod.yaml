@@ -1,0 +1,38 @@
+# External DNS - prod env overrides
+#
+# Azure Workload Identity setup for external-dns:
+#  - The kubernetes-sigs/external-dns chart doesn't have a first-class Azure
+#    Workload Identity toggle. The chart's `azure.json` config file is the
+#    only knob it accepts. So we feed it one via `secretConfiguration` (the
+#    chart materializes it as a Secret + mounts it at /etc/kubernetes/),
+#    with `useWorkloadIdentityExtension: true` inside — external-dns then
+#    skips the legacy SP-secret path and uses the federated token injected
+#    by the workload-identity webhook.
+#  - podLabels.azure.workload.identity/use=true triggers the webhook.
+#  - SA annotation maps to the UAMI's client_id.
+#  - `--txt-owner-id=prod-aks` namespaces the TXT registry records so this
+#    cluster only owns the records it created.
+
+podLabels:
+  azure.workload.identity/use: "true"
+
+serviceAccount:
+  labels:
+    azure.workload.identity/use: "true"
+  annotations:
+    azure.workload.identity/client-id: "a2c1806f-89c4-4582-98f8-caa1f8bd1095"
+
+secretConfiguration:
+  enabled: true
+  mountPath: /etc/kubernetes
+  data:
+    azure.json: |
+      {
+        "tenantId": "a93f0851-4bf4-455f-9962-1552a5067f94",
+        "subscriptionId": "8391ac17-28dd-47d0-8e14-6a1051376a6e",
+        "resourceGroup": "prod",
+        "useWorkloadIdentityExtension": true
+      }
+
+extraArgs:
+  - --txt-owner-id=prod-aks

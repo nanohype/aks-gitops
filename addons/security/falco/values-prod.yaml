@@ -1,0 +1,26 @@
+# Falco - prod env overrides
+
+resources:
+  requests:
+    cpu: 200m
+    memory: 1Gi
+  limits:
+    cpu: 2000m
+    memory: 4Gi
+
+driver:
+  modern_ebpf:
+    cpus_for_each_buffer: 8
+
+# k8s-metacollector is a separate Deployment (subchart) that pushes
+# Kubernetes metadata into Falco via the k8smeta plugin. Without explicit
+# CPU + memory limits Kyverno's require-resource-limits policy blocks the
+# pod creation and the metacollector Deployment stays 0/1.
+k8s-metacollector:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi

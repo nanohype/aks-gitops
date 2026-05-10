@@ -1,0 +1,40 @@
+# Grafana Agent - prod env overrides
+#
+# The chart's value-path layout is `agent.*` for the running agent
+# container (extraEnv, resources, config, etc.) and `controller.*` for
+# the DaemonSet/Deployment shape (replicas, podLabels, tolerations).
+# Putting these at top level silently no-ops.
+#
+# AMW_REMOTE_WRITE_URL = DCE.logs_ingestion_endpoint + /dataCollectionRules/
+# DCR.immutable_id + /streams/Microsoft-PrometheusMetrics/api/v1/write.
+# Both halves come from the landing-zone managed-monitoring component
+# (`terragrunt output amw_remote_write_url`). Update whenever the DCE or
+# DCR is recreated — the immutable_id changes on replacement. The
+# `task wire` script in this repo automates the update.
+
+serviceAccount:
+  annotations:
+    azure.workload.identity/client-id: "1d1c9055-acc0-41d6-8590-6d1d6d8f01b4"
+
+controller:
+  # azure.workload.identity/use=true at the POD level is what triggers the
+  # mutating webhook that injects AZURE_CLIENT_ID / AZURE_TENANT_ID /
+  # AZURE_AUTHORITY_HOST / AZURE_FEDERATED_TOKEN_FILE env vars. Without
+  # this the river `env(...)` calls all return empty and the oauth2 block
+  # in the prometheus.remote_write config can't init.
+  podLabels:
+    azure.workload.identity/use: "true"
+
+agent:
+  extraEnv:
+    - name: AMW_REMOTE_WRITE_URL
+      value: "https://prod-aks-amw-dce-ed54.westus2-1.metrics.ingest.monitor.azure.com/dataCollectionRules/dcr-051a89947a17412a90e6f56a908913f5/streams/Microsoft-PrometheusMetrics/api/v1/write?api-version=2023-04-24"
+    - name: CLUSTER_NAME
+      value: "prod-aks"
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi

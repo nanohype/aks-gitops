@@ -1,0 +1,21 @@
+# Reloader - Auto-reload on ConfigMap/Secret changes
+#
+# Resource limits + tolerations live under `reloader.deployment.*`, NOT
+# `reloader.*` — the chart namespaces all Deployment-spec values under a
+# `deployment:` block. Setting them at the wrong level silently no-ops,
+# leaves containers without limits, and Kyverno's require-resource-limits
+# policy blocks the Deployment from creating pods.
+
+reloader:
+  reloadStrategy: annotations
+  deployment:
+    resources:
+      requests:
+        cpu: 25m
+        memory: 64Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
+    tolerations:
+      - key: CriticalAddonsOnly
+        operator: Exists

@@ -1,0 +1,106 @@
+# Kyverno - Kubernetes Native Policy Management
+
+admissionController:
+  replicas: 3
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  tolerations:
+    - key: CriticalAddonsOnly
+      operator: Exists
+
+backgroundController:
+  replicas: 2
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  tolerations:
+    - key: CriticalAddonsOnly
+      operator: Exists
+
+reportsController:
+  replicas: 2
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  tolerations:
+    - key: CriticalAddonsOnly
+      operator: Exists
+
+cleanupController:
+  replicas: 1
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+  tolerations:
+    - key: CriticalAddonsOnly
+      operator: Exists
+
+# Enable policy reports for visibility
+features:
+  policyExceptions:
+    enabled: true
+  reporting:
+    validate: true
+    mutate: true
+    generate: true
+
+# Webhook configuration
+#
+# Bitnami archived their public Docker Hub images in mid-2025;
+# `docker.io/bitnami/kubectl:*` now returns 404 manifest-not-found.
+# Every kyverno chart spot that defaults to `bitnami/kubectl` needs to
+# be overridden — Chainguard's distroless kubectl (cgr.dev/chainguard/
+# kubectl) is the drop-in replacement: same kubectl binary, public,
+# signed, no auth required. Three spots to patch:
+#   webhooksCleanup    pre-delete helm hook
+#   policyReportsCleanup post-upgrade helm hook  (most visible — runs on every chart sync)
+#   cleanupJobs        recurring CronJob for admission report rotation
+webhooksCleanup:
+  enabled: true
+  image:
+    registry: cgr.dev
+    repository: chainguard/kubectl
+    tag: latest
+
+policyReportsCleanup:
+  enabled: true
+  image:
+    registry: cgr.dev
+    repository: chainguard/kubectl
+    tag: latest
+
+# Override kubectl image for helm hooks
+cleanupJobs:
+  admissionReports:
+    # Bitnami archived their public Docker Hub images in 2025;
+    # `docker.io/bitnami/kubectl:*` now returns 404 manifest-not-found.
+    # Switched to Chainguard's distroless kubectl (free, public, signed).
+    image:
+      registry: cgr.dev
+      repository: chainguard/kubectl
+      tag: latest
+  clusterAdmissionReports:
+    # Bitnami archived their public Docker Hub images in 2025;
+    # `docker.io/bitnami/kubectl:*` now returns 404 manifest-not-found.
+    # Switched to Chainguard's distroless kubectl (free, public, signed).
+    image:
+      registry: cgr.dev
+      repository: chainguard/kubectl
+      tag: latest

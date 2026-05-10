@@ -1,0 +1,22 @@
+# Azure Monitor Workspace data source. The URL is per-environment (patched
+# by overlays/{env}/grafana-patch.yaml). access=proxy means Grafana itself
+# (using its system-assigned identity → AMW Monitoring Data Reader role)
+# performs the query, so no per-user auth needed in the data source.
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  name: managed-prometheus
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: external
+  datasource:
+    name: ManagedPrometheus
+    type: prometheus
+    access: proxy
+    url: https://placeholder-amw.westus2.prometheus.monitor.azure.com  # patched per-env
+    isDefault: true
+    jsonData:
+      httpMethod: POST
+      manageAlerts: false
+      prometheusType: Prometheus

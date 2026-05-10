@@ -1,0 +1,16 @@
+# KEDA - prod env overrides
+
+serviceAccount:
+  operator:
+    labels:
+      azure.workload.identity/use: "true"
+    annotations:
+      azure.workload.identity/client-id: "fdc12048-4d2c-42c4-80fa-bee8601ce501"
+
+podDisruptionBudget:
+  operator:
+    minAvailable: 1
+  metricServer:
+    minAvailable: 1
+  webhooks:
+    minAvailable: 1

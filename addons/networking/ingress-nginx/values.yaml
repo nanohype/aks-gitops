@@ -1,0 +1,53 @@
+# Ingress NGINX Controller (Azure)
+# Front-ended by an Azure Load Balancer (created automatically by Service type=LoadBalancer)
+
+controller:
+  replicaCount: 2
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+  tolerations:
+    - key: CriticalAddonsOnly
+      operator: Exists
+
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
+
+  service:
+    enabled: true
+    type: LoadBalancer
+    annotations:
+      service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: /healthz
+      service.beta.kubernetes.io/azure-load-balancer-internal: "false"
+    externalTrafficPolicy: Local
+
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: false
+
+  # Admission webhook intentionally disabled. The chart's pre-install Job
+  # to provision the webhook TLS cert kept wedging ArgoCD's sync state
+  # machine — the Job pod runs (or doesn't, depending on scheduling), gets
+  # immediately deleted by the chart's `hook-delete-policy: hook-succeeded`,
+  # and Argo's hook-completion tracking never advances. Result: the App
+  # stays in `operationState.phase: Running` forever, the rest of the chart
+  # never installs, the namespace stays empty.
+  #
+  # Without admissionWebhooks, the ValidatingWebhookConfiguration that
+  # rejects bad Ingress resources at admission time is gone. Ingress
+  # resources can still be created with structural errors; they just fail
+  # silently at reconcile time instead of being rejected up-front. For a
+  # portfolio cluster that's an acceptable tradeoff. For a regulated /
+  # multi-tenant env, re-enable and figure out the hook-tracking issue
+  # (likely needs a different chart version or a sync hook annotation
+  # tweak so Argo treats the Job as a regular resource).
+  admissionWebhooks:
+    enabled: false

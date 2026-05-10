@@ -1,0 +1,15 @@
+# Grafana Operator - prod env overrides
+
+replicas: 2
+
+# Kyverno's `require-run-as-non-root` cluster policy enforces a pod-level
+# `securityContext.runAsNonRoot: true` (it checks `/spec/template/spec/
+# securityContext/runAsNonRoot/`, NOT the container-level setting). The
+# chart's default template emits container-level `runAsNonRoot: true` but
+# leaves `spec.template.spec.securityContext` empty, so the policy admission
+# webhook rejects the Deployment. The chart's pod-level key is
+# `podSecurityContext`, not `securityContext` (which would be container-level).
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 65532
+  runAsGroup: 65532

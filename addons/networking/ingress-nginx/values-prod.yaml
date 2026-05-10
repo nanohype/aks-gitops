@@ -1,0 +1,16 @@
+# Ingress NGINX - prod env overrides
+
+controller:
+  replicaCount: 3
+
+  # Kyverno's require-run-as-non-root cluster policy checks
+  # `/spec/template/spec/securityContext/runAsNonRoot`. The chart's defaults
+  # only set the container-level securityContext (runAsUser: 101 on the
+  # controller container), leaving the pod-level securityContext empty,
+  # which fails the policy. UID 101 is the conventional `www-data` UID
+  # baked into the ingress-nginx image.
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 101
+    runAsGroup: 82
+    fsGroup: 101

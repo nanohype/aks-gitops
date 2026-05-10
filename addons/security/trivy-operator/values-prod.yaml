@@ -1,0 +1,15 @@
+# Trivy Operator - prod env overrides
+#
+# nodeCollector pins each pod to a specific node via `kubernetes.io/hostname`
+# nodeSelector. On a cluster with tainted system-pool nodes (the
+# CriticalAddonsOnly:NoSchedule taint that AKS applies to managed system
+# pools), the pod can't schedule without a matching toleration — even
+# though the nodeSelector "found" the node. Add the toleration so node-
+# collector pods can land on system nodes too. Without this, the pod sits
+# Pending forever and NAP can't help because Karpenter rejects pods that
+# use restricted labels like kubernetes.io/hostname.
+
+nodeCollector:
+  tolerations:
+    - key: CriticalAddonsOnly
+      operator: Exists

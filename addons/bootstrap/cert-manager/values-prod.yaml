@@ -1,0 +1,15 @@
+# cert-manager - prod env overrides
+
+replicaCount: 3
+
+serviceAccount:
+  labels:
+    azure.workload.identity/use: "true"
+  annotations:
+    azure.workload.identity/client-id: "5421397b-923d-4196-8485-8e429a0b36d9"
+
+webhook:
+  replicaCount: 3
+
+cainjector:
+  replicaCount: 3

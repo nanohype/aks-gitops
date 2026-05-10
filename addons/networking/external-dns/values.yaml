@@ -1,0 +1,28 @@
+# External DNS (Azure)
+# Uses Azure DNS via Workload Identity
+
+provider:
+  name: azure
+
+policy: sync
+
+sources:
+  - service
+  - ingress
+
+# Azure-specific configuration (resource group, subscription ID, client ID,
+# Workload Identity wiring) is supplied per-env in values-<env>.yaml. The
+# base file intentionally has no Azure-side args so that adding a new env
+# is a fully-self-contained values file rather than a values + base edit.
+
+resources:
+  requests:
+    cpu: 25m
+    memory: 64Mi
+  limits:
+    cpu: 100m
+    memory: 128Mi
+
+tolerations:
+  - key: CriticalAddonsOnly
+    operator: Exists

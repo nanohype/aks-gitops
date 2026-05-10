@@ -1,0 +1,7 @@
+# External Secrets - prod env overrides
+
+serviceAccount:
+  labels:
+    azure.workload.identity/use: "true"
+  annotations:
+    azure.workload.identity/client-id: "4095916c-4611-4f33-b1f6-71f3a4f85fb0"

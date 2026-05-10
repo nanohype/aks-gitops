@@ -1,0 +1,8 @@
+# Argo Events - prod env overrides
+
+controller:
+  serviceAccount:
+    labels:
+      azure.workload.identity/use: "true"
+    annotations:
+      azure.workload.identity/client-id: "4c12f04e-cf8e-4fa6-8750-fbafca944ca0"

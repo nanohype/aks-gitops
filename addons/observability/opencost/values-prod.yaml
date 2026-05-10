@@ -1,0 +1,7 @@
+# OpenCost - prod env overrides
+
+serviceAccount:
+  labels:
+    azure.workload.identity/use: "true"
+  annotations:
+    azure.workload.identity/client-id: "c0801ab7-a3b8-4f14-9aa6-f03f5252e283"

@@ -1,0 +1,17 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base
+patches:
+  - target:
+      group: external-secrets.io
+      version: v1
+      kind: ClusterSecretStore
+      name: azure-key-vault
+    patch: |
+      - op: replace
+        path: /spec/provider/azurekv/vaultUrl
+        value: https://prodsecrets8391ac1728dd4.vault.azure.net/
+      - op: replace
+        path: /spec/provider/azurekv/tenantId
+        value: a93f0851-4bf4-455f-9962-1552a5067f94

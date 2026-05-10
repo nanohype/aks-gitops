@@ -1,0 +1,27 @@
+# Velero - prod env overrides
+
+serviceAccount:
+  server:
+    labels:
+      azure.workload.identity/use: "true"
+    annotations:
+      azure.workload.identity/client-id: "543b8c76-555f-4c0f-8bef-de642f7b6b42"
+
+# CRDs are managed by ArgoCD via `--include-crds` on helm template. The
+# chart's `upgradeCRDs` Job spins up a pre-install hook that creates
+# `clusterroles/velero-upgrade-crds` plus the binding, which races every
+# subsequent install attempt (the ClusterRole sticks around even on hook
+# cleanup, so retries hit `already exists`). Disabling the hook avoids
+# the race; the CRDs themselves still ship with the chart and apply
+# normally via ArgoCD's sync.
+upgradeCRDs: false
+
+configuration:
+  backupStorageLocation:
+    - name: default
+      provider: azure
+      bucket: velero
+      config:
+        resourceGroup: prod
+        storageAccount: prodaksbackups8391ac1728
+        subscriptionId: 8391ac17-28dd-47d0-8e14-6a1051376a6e

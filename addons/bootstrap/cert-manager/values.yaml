@@ -1,0 +1,62 @@
+# cert-manager - TLS Certificate Management
+
+installCRDs: true
+
+replicaCount: 2
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 128Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi
+
+tolerations:
+  - key: CriticalAddonsOnly
+    operator: Exists
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+webhook:
+  replicaCount: 2
+  resources:
+    requests:
+      cpu: 25m
+      memory: 32Mi
+    limits:
+      cpu: 100m
+      memory: 64Mi
+  tolerations:
+    - key: CriticalAddonsOnly
+      operator: Exists
+
+cainjector:
+  replicaCount: 2
+  resources:
+    requests:
+      cpu: 25m
+      memory: 128Mi
+    limits:
+      cpu: 100m
+      memory: 256Mi
+  tolerations:
+    - key: CriticalAddonsOnly
+      operator: Exists
+
+# startupapicheck is a one-shot Job that hits the webhook to confirm
+# cert-manager's API is reachable. The Job creates its own SA + Role +
+# RoleBinding as helm pre-install hooks with
+# `helm.sh/hook-delete-policy: hook-succeeded,before-hook-creation`. With
+# ArgoCD's Replace=true sync option, the hook artifacts churn on every
+# reconcile and frequently land in a "Role already exists" state that
+# blocks the App from reaching Synced.
+#
+# The check is purely advisory — cert-manager works fine without it. The
+# webhook is its own readiness signal (the Deployment's readiness probe
+# already verifies API reachability). Disabling the Job removes the hook-
+# tracking wedge and lets ArgoCD stay green.
+startupapicheck:
+  enabled: false

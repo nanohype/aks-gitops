@@ -1,0 +1,26 @@
+# Loki - prod env overrides
+#
+# Workload Identity is wired up (the UAMI has Storage Blob Data Contributor
+# on the loki storage account), but the chart's storage backend stays on
+# the SingleBinary filesystem/PVC path for now. Switching to `storage.type:
+# azure` introduces volumeMount drift the chart doesn't fully reconcile in
+# SingleBinary mode — bringing chunks into Blob is a follow-up that needs
+# either the distributed deployment mode or a chart upgrade.
+
+serviceAccount:
+  labels:
+    azure.workload.identity/use: "true"
+  annotations:
+    azure.workload.identity/client-id: "974d5eae-db59-48f0-97c6-13f251ddc86b"
+
+loki:
+  commonConfig:
+    replication_factor: 1
+  limits_config:
+    retention_period: 2160h
+
+singleBinary:
+  podLabels:
+    azure.workload.identity/use: "true"
+  persistence:
+    size: 100Gi

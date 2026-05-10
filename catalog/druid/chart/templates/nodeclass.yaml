@@ -1,0 +1,16 @@
+apiVersion: karpenter.azure.com/v1beta1
+kind: AKSNodeClass
+metadata:
+  name: {{ include "druid.name" . }}-druid-nodeclass
+  labels:
+    {{- include "common.labels" . | indent 4 }}
+  annotations:
+    {{- include "common.annotations" . | indent 4 }}
+spec:
+  imageFamily: AzureLinux
+  osDiskSizeGB: 128
+  tags:
+    "{{ .Values.domain }}:resource-type": dynamic-instance
+    "{{ .Values.domain }}:category": analytics
+    "{{ .Values.domain }}:type": druid
+    "{{ .Values.domain }}:part-of": "{{ .Values.organization }}.{{ .Values.name }}.{{ .Values.alias }}"
