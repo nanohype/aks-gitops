@@ -1,0 +1,29 @@
+# External DNS (Azure)
+# Uses Azure DNS via Workload Identity
+
+provider:
+  name: azure
+
+policy: sync
+
+sources:
+  - service
+  - ingress
+
+# Azure-specific configuration is supplied via the SecretProviderClass / Secret
+# referenced by the chart's `azure.secretName` (deployed by IaC out of band) or
+# you can switch to using the in-cluster managed identity:
+extraArgs:
+  - --azure-resource-group=$(AZURE_RESOURCE_GROUP)
+
+resources:
+  requests:
+    cpu: 25m
+    memory: 64Mi
+  limits:
+    cpu: 100m
+    memory: 128Mi
+
+tolerations:
+  - key: CriticalAddonsOnly
+    operator: Exists

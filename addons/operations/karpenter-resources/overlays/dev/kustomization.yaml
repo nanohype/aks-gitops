@@ -1,0 +1,35 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base
+
+patches:
+  - patch: |-
+      apiVersion: karpenter.sh/v1
+      kind: NodePool
+      metadata:
+        name: default
+      spec:
+        limits:
+          cpu: 50
+          memory: 100Gi
+        disruption:
+          budgets:
+            - nodes: "50%"
+    target:
+      kind: NodePool
+      name: default
+
+  - patch: |-
+      apiVersion: karpenter.azure.com/v1beta1
+      kind: AKSNodeClass
+      metadata:
+        name: default
+      spec:
+        tags:
+          environment: dev
+          managed-by: karpenter
+    target:
+      kind: AKSNodeClass
+      name: default

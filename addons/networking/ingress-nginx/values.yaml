@@ -1,0 +1,39 @@
+# Ingress NGINX Controller (Azure)
+# Front-ended by an Azure Load Balancer (created automatically by Service type=LoadBalancer)
+
+controller:
+  replicaCount: 2
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+  tolerations:
+    - key: CriticalAddonsOnly
+      operator: Exists
+
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
+
+  service:
+    enabled: true
+    type: LoadBalancer
+    annotations:
+      service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: /healthz
+      service.beta.kubernetes.io/azure-load-balancer-internal: "false"
+    externalTrafficPolicy: Local
+
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: false
+
+  admissionWebhooks:
+    enabled: true
+    patch:
+      enabled: true

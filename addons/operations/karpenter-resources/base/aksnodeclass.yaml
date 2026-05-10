@@ -1,0 +1,10 @@
+apiVersion: karpenter.azure.com/v1beta1
+kind: AKSNodeClass
+metadata:
+  name: default
+spec:
+  imageFamily: AzureLinux
+  osDiskSizeGB: 128
+  tags:
+    managed-by: karpenter
+    environment: "${ENVIRONMENT}"

@@ -1,0 +1,80 @@
+# Velero - Backup and Disaster Recovery (Azure)
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+# Azure plugin
+initContainers:
+  - name: velero-plugin-for-microsoft-azure
+    image: velero/velero-plugin-for-microsoft-azure:v1.11.0
+    volumeMounts:
+      - mountPath: /target
+        name: plugins
+
+# Configuration
+configuration:
+  backupStorageLocation:
+    - name: default
+      provider: azure
+      bucket: ""  # Container name; set per environment in values-{env}.yaml
+      config:
+        resourceGroup: ""
+        storageAccount: ""
+        subscriptionId: ""
+  volumeSnapshotLocation:
+    - name: default
+      provider: azure
+      config:
+        resourceGroup: ""
+        subscriptionId: ""
+        incremental: "true"
+
+# CSI snapshots
+features: "EnableCSI"
+
+# Node agent for file-level backups
+deployNodeAgent: true
+nodeAgent:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+  tolerations:
+    - operator: Exists
+
+tolerations:
+  - key: CriticalAddonsOnly
+    operator: Exists
+
+# Override kubectl image for helm hooks
+kubectl:
+  image:
+    repository: docker.io/bitnami/kubectl
+    tag: latest
+
+# Default backup schedules
+schedules:
+  daily:
+    disabled: false
+    schedule: "0 3 * * *"
+    template:
+      ttl: 720h  # 30 days
+      storageLocation: default
+      volumeSnapshotLocations:
+        - default
+  weekly:
+    disabled: false
+    schedule: "0 2 * * 0"
+    template:
+      ttl: 2160h  # 90 days
+      storageLocation: default
+      volumeSnapshotLocations:
+        - default

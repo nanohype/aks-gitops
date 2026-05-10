@@ -1,0 +1,19 @@
+# Grafana Agent - Production overrides
+
+serviceAccount:
+  annotations:
+    azure.workload.identity/client-id: "00000000-0000-0000-0000-000000000000"
+
+extraEnv:
+  - name: AMW_REMOTE_WRITE_URL
+    value: "https://production-aks-amw.westus2.prometheus.monitor.azure.com/api/v1/write"
+  - name: CLUSTER_NAME
+    value: "production-aks"
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi

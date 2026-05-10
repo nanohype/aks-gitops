@@ -1,0 +1,38 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base
+
+patches:
+  - patch: |-
+      apiVersion: karpenter.sh/v1
+      kind: NodePool
+      metadata:
+        name: default
+      spec:
+        limits:
+          cpu: 75
+          memory: 150Gi
+    target:
+      kind: NodePool
+      name: default
+
+  - patch: |-
+      apiVersion: karpenter.azure.com/v1beta1
+      kind: AKSNodeClass
+      metadata:
+        name: default
+      spec:
+        tags:
+          environment: staging
+          managed-by: karpenter
+    target:
+      kind: AKSNodeClass
+      name: default
+
+configMapGenerator:
+  - name: karpenter-config
+    literals:
+      - CLUSTER_NAME=staging-aks
+      - ENVIRONMENT=staging

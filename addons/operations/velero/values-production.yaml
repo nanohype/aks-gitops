@@ -1,0 +1,19 @@
+# Velero - Production overrides
+# Production: production backup container
+
+serviceAccount:
+  server:
+    labels:
+      azure.workload.identity/use: "true"
+    annotations:
+      azure.workload.identity/client-id: "00000000-0000-0000-0000-000000000000"
+
+configuration:
+  backupStorageLocation:
+    - name: default
+      provider: azure
+      bucket: velero
+      config:
+        resourceGroup: aks-production-rg
+        storageAccount: aksproductionbackups
+        subscriptionId: 00000000-0000-0000-0000-000000000000

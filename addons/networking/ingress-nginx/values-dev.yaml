@@ -1,0 +1,6 @@
+# Ingress NGINX - Dev overrides
+
+controller:
+  replicaCount: 1
+  podDisruptionBudget:
+    enabled: false

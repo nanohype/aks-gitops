@@ -1,0 +1,149 @@
+# Grafana Agent - Telemetry collection (Flow mode)
+# Collects logs, metrics, and traces and forwards to Loki/Tempo/AMW.
+#
+# Metrics: scraped from kube-state-metrics + cAdvisor + node-exporter +
+#   pods with prometheus.io/scrape annotations, then remote-written to
+#   the Azure Monitor Workspace (managed Prometheus). AAD bearer token
+#   is acquired via Azure Workload Identity (federated SA token →
+#   Microsoft.Monitor/accounts audience).
+
+agent:
+  mode: flow
+  configMap:
+    create: true
+    content: |
+      // ────────────────────────────── Discovery ──────────────────────────────
+      discovery.kubernetes "pods" {
+        role = "pod"
+      }
+      discovery.kubernetes "nodes" {
+        role = "node"
+      }
+      discovery.kubernetes "services" {
+        role = "service"
+      }
+      discovery.relabel "pods" {
+        targets = discovery.kubernetes.pods.targets
+        rule {
+          source_labels = ["__meta_kubernetes_pod_annotation_prometheus_io_scrape"]
+          regex         = "true"
+          action        = "keep"
+        }
+        rule {
+          source_labels = ["__meta_kubernetes_namespace"]
+          target_label  = "namespace"
+        }
+        rule {
+          source_labels = ["__meta_kubernetes_pod_name"]
+          target_label  = "pod"
+        }
+        rule {
+          source_labels = ["__meta_kubernetes_pod_container_name"]
+          target_label  = "container"
+        }
+      }
+
+      // ────────────────────────────── Metrics → AMW ──────────────────────────
+      prometheus.scrape "pods" {
+        targets    = discovery.relabel.pods.output
+        forward_to = [prometheus.remote_write.amw.receiver]
+      }
+
+      prometheus.scrape "kube_state_metrics" {
+        targets = [{
+          __address__ = "kube-state-metrics.kube-system.svc.cluster.local:8080",
+        }]
+        forward_to = [prometheus.remote_write.amw.receiver]
+      }
+
+      prometheus.scrape "cadvisor" {
+        targets    = discovery.kubernetes.nodes.targets
+        scheme     = "https"
+        bearer_token_file = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+        tls_config {
+          ca_file              = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+          insecure_skip_verify = true
+        }
+        metrics_path = "/metrics/cadvisor"
+        forward_to   = [prometheus.remote_write.amw.receiver]
+      }
+
+      // OAuth2 client-credentials flow against the AAD v2 endpoint with the
+      // workload-identity federated token as client_assertion. The AMW
+      // expects audience https://monitor.azure.com/.default.
+      prometheus.remote_write "amw" {
+        endpoint {
+          url = sys.env("AMW_REMOTE_WRITE_URL")
+          oauth2 {
+            client_id = sys.env("AZURE_CLIENT_ID")
+            token_url = format("%s/%s/oauth2/v2.0/token", sys.env("AZURE_AUTHORITY_HOST"), sys.env("AZURE_TENANT_ID"))
+            scopes    = ["https://monitor.azure.com/.default"]
+            endpoint_params = {
+              grant_type            = "client_credentials",
+              client_assertion_type = "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+            }
+          }
+        }
+        external_labels = {
+          cluster = sys.env("CLUSTER_NAME"),
+        }
+      }
+
+      // ────────────────────────────── Logs → Loki ────────────────────────────
+      loki.source.kubernetes "pods" {
+        targets    = discovery.kubernetes.pods.targets
+        forward_to = [loki.write.default.receiver]
+      }
+      loki.write "default" {
+        endpoint {
+          url = "http://loki-gateway.monitoring.svc.cluster.local/loki/api/v1/push"
+        }
+      }
+
+      // ────────────────────────────── Traces → Tempo ─────────────────────────
+      otelcol.receiver.otlp "default" {
+        grpc {
+          endpoint = "0.0.0.0:4317"
+        }
+        http {
+          endpoint = "0.0.0.0:4318"
+        }
+        output {
+          traces = [otelcol.exporter.otlp.tempo.input]
+        }
+      }
+      otelcol.exporter.otlp "tempo" {
+        client {
+          endpoint = "tempo.monitoring.svc.cluster.local:4317"
+          tls {
+            insecure = true
+          }
+        }
+      }
+
+# Workload Identity is required for bearer-token auth to AMW.
+# values-{env}.yaml sets the client-id annotation on the SA.
+serviceAccount:
+  create: true
+  name: grafana-agent
+  labels:
+    azure.workload.identity/use: "true"
+
+# AMW remote-write URL is per-environment (set in values-{env}.yaml from
+# Terraform output `amw_remote_write_url`). CLUSTER_NAME is per-environment.
+extraEnv:
+  - name: AMW_REMOTE_WRITE_URL
+    value: ""  # override per env
+  - name: CLUSTER_NAME
+    value: ""  # override per env
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 128Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi
+
+tolerations:
+  - operator: Exists
