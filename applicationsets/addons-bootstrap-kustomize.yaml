@@ -17,6 +17,10 @@ spec:
                   argocd.argoproj.io/secret-type: cluster
           - list:
               elements:
+                - appName: external-secrets-stores
+                  namespace: external-secrets
+                  path: addons/bootstrap/external-secrets-stores
+                  syncWave: "1"
                 - appName: storage-classes
                   namespace: kube-system
                   path: addons/bootstrap/storage-classes
