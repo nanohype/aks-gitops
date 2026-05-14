@@ -1,0 +1,13 @@
+apiVersion: external-secrets.io/v1
+kind: ClusterSecretStore
+metadata:
+  name: azure-key-vault
+spec:
+  provider:
+    azurekv:
+      authType: WorkloadIdentity
+      vaultUrl: PLACEHOLDER_VAULT_URL
+      tenantId: PLACEHOLDER_TENANT_ID
+      serviceAccountRef:
+        name: external-secrets
+        namespace: external-secrets
