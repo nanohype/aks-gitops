@@ -4,4 +4,4 @@ serviceAccount:
   labels:
     azure.workload.identity/use: "true"
   annotations:
-    azure.workload.identity/client-id: "00000000-0000-0000-0000-000000000000"
+    azure.workload.identity/client-id: "d2e4ff53-4e4e-4c9f-9a9f-dc59bf2857cd"
