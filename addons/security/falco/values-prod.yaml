@@ -1,4 +1,4 @@
-# Falco - Production overrides
+# Falco - prod env overrides
 
 resources:
   requests:

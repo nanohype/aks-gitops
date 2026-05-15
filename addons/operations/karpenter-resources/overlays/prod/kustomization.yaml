@@ -51,7 +51,7 @@ patches:
         name: default
       spec:
         tags:
-          environment: production
+          environment: prod
           managed-by: karpenter
     target:
       kind: AKSNodeClass
@@ -60,5 +60,5 @@ patches:
 configMapGenerator:
   - name: karpenter-config
     literals:
-      - CLUSTER_NAME=production-aks
-      - ENVIRONMENT=production
+      - CLUSTER_NAME=prod-aks
+      - ENVIRONMENT=prod

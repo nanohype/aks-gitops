@@ -1,4 +1,4 @@
-# cert-manager - Production overrides
+# cert-manager - prod env overrides
 
 replicaCount: 3
 

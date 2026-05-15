@@ -1,5 +1,4 @@
-# Velero - Production overrides
-# Production: production backup container
+# Velero - prod env overrides
 
 serviceAccount:
   server:

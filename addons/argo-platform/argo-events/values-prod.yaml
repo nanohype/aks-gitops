@@ -1,4 +1,4 @@
-# Argo Events - Production overrides
+# Argo Events - prod env overrides
 
 controller:
   serviceAccount:

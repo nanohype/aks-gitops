@@ -8,14 +8,14 @@ patches:
   - patch: |-
       - op: replace
         path: /spec/external/url
-        value: https://production-aks-grafana.cuw.grafana.azure.com
+        value: https://prod-aks-grafana-azghhmakabeuhaa2.wus2.grafana.azure.com
     target:
       kind: Grafana
       name: external
   - patch: |-
       - op: replace
         path: /spec/datasource/url
-        value: https://production-aks-amw.westus2.prometheus.monitor.azure.com
+        value: https://prod-aks-amw-chhnb2fxgjg8g7aw.westus2.prometheus.monitor.azure.com
     target:
       kind: GrafanaDatasource
       name: managed-prometheus

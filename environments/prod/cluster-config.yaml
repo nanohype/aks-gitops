@@ -4,12 +4,12 @@ metadata:
   name: cluster-config
   namespace: argocd
   labels:
-    environment: production
+    environment: prod
 data:
   # Cluster identification
-  environment: "production"
+  environment: "prod"
   provider: "azure"
-  cluster_name: "production-aks"
+  cluster_name: "prod-aks"
 
   # Azure configuration
   region: "westus2"

@@ -10,7 +10,7 @@ on:
         options:
           - dev
           - staging
-          - production
+          - prod
 
 jobs:
   diff:

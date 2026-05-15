@@ -1,4 +1,4 @@
-# External DNS - Production overrides
+# External DNS - prod env overrides
 
 serviceAccount:
   labels:

@@ -1,4 +1,4 @@
-# Grafana Agent - Production overrides
+# Grafana Agent - prod env overrides
 #
 # AMW_REMOTE_WRITE_URL = DCE.logs_ingestion_endpoint + /dataCollectionRules/
 # DCR.immutable_id + /streams/Microsoft-PrometheusMetrics/api/v1/write. Both

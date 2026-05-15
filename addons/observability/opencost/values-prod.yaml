@@ -1,4 +1,4 @@
-# OpenCost - Production overrides
+# OpenCost - prod env overrides
 
 serviceAccount:
   labels:

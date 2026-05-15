@@ -1,4 +1,4 @@
-# Argo Workflows - Production overrides
+# Argo Workflows - prod env overrides
 
 server:
   serviceAccount:

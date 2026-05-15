@@ -1,4 +1,4 @@
-# Ingress NGINX - Production overrides
+# Ingress NGINX - prod env overrides
 
 controller:
   replicaCount: 3

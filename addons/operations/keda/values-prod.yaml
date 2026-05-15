@@ -1,4 +1,4 @@
-# KEDA - Production overrides
+# KEDA - prod env overrides
 
 serviceAccount:
   operator:

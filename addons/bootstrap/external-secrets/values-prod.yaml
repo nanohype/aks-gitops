@@ -1,4 +1,4 @@
-# External Secrets - Production overrides
+# External Secrets - prod env overrides
 
 serviceAccount:
   labels:

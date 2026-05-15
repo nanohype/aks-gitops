@@ -27,7 +27,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        environment: [dev, staging, production]
+        environment: [dev, staging, prod]
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -59,7 +59,7 @@ jobs:
         uses: actions/github-script@v8
         with:
           script: |
-            const environments = ['dev', 'staging', 'production'];
+            const environments = ['dev', 'staging', 'prod'];
             const rows = environments.map(env => {
               const job = context.payload.workflow_run?.jobs?.find(j => j.name.includes(env));
               return `| ${env} | :white_check_mark: |`;

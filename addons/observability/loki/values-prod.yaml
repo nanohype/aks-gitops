@@ -1,4 +1,4 @@
-# Loki - Production overrides
+# Loki - prod env overrides
 #
 # - Workload Identity points at the Loki UAMI (Storage Blob Data Contributor
 #   on the loki storage account).

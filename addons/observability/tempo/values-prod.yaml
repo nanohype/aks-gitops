@@ -1,4 +1,4 @@
-# Tempo - Production overrides
+# Tempo - prod env overrides
 #
 # - Workload Identity points at the Tempo UAMI (Storage Blob Data Contributor
 #   on the tempo storage account).
