@@ -1,5 +1,12 @@
 # Tempo - Production overrides
-# Production: longer retention, larger storage
+#
+# - Workload Identity points at the Tempo UAMI (Storage Blob Data Contributor
+#   on the tempo storage account).
+# - Trace backend swaps from PVC filesystem to Azure Blob; traces go to the
+#   `tempo-traces` container in the storage account provisioned by the
+#   landing-zone cluster-addons component.
+# - podLabels.azure.workload.identity/use=true is required so the Azure
+#   Workload Identity webhook mutates the pod with the federated token volume.
 
 serviceAccount:
   labels:
@@ -8,7 +15,16 @@ serviceAccount:
     azure.workload.identity/client-id: "91b2056d-bdb4-4a87-b5e8-615b57fbb291"
 
 tempo:
+  podLabels:
+    azure.workload.identity/use: "true"
   retention: 720h
+  storage:
+    trace:
+      backend: azure
+      azure:
+        container_name: tempo-traces
+        storage_account_name: prodakstempo8391ac1728dd
+        use_federated_token: true
 
 persistence:
   size: 100Gi

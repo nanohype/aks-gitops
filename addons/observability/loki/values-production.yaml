@@ -1,5 +1,12 @@
 # Loki - Production overrides
-# Production: longer retention, larger storage
+#
+# - Workload Identity points at the Loki UAMI (Storage Blob Data Contributor
+#   on the loki storage account).
+# - Storage backend swaps from PVC filesystem to Azure Blob; chunks go to the
+#   `loki-chunks` container in the storage account provisioned by the
+#   landing-zone cluster-addons component.
+# - podLabels.azure.workload.identity/use=true is required so the Azure
+#   Workload Identity webhook mutates the pod with the federated token volume.
 
 serviceAccount:
   labels:
@@ -12,7 +19,28 @@ loki:
     replication_factor: 1
   limits_config:
     retention_period: 2160h
+  schemaConfig:
+    configs:
+      - from: "2024-01-01"
+        store: tsdb
+        object_store: azure
+        schema: v13
+        index:
+          prefix: loki_index_
+          period: 24h
+  storage:
+    type: azure
+    bucketNames:
+      chunks: loki-chunks
+      ruler: loki-chunks
+      admin: loki-chunks
+    azure:
+      accountName: prodaksloki8391ac1728dd4
+      containerName: loki-chunks
+      useFederatedToken: true
 
 singleBinary:
+  podLabels:
+    azure.workload.identity/use: "true"
   persistence:
     size: 100Gi

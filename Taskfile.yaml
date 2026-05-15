@@ -63,3 +63,8 @@ tasks:
     desc: Remove rendered output
     cmds:
       - rm -rf rendered/
+
+  smoke:
+    desc: Run the end-to-end platform smoke test against the current kube-context (ENV=name to tag output, SKIP_DESTRUCTIVE=1 to skip checks that create resources)
+    cmds:
+      - ./scripts/smoke.sh
