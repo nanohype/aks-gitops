@@ -1,12 +1,10 @@
 # Grafana Agent - Production overrides
 #
-# NOTE — AMW_REMOTE_WRITE_URL is currently the query endpoint with a
-# placeholder DCR segment. Real ingestion to Azure Managed Prometheus needs a
-# Data Collection Endpoint (DCE) + Data Collection Rule (DCR) provisioned by
-# the landing-zone managed-monitoring component, and the DCR's immutableId
-# substituted into the URL in place of `.../`. The DCR resources are tracked
-# as a follow-up; until they land, this addon will reconcile and run but
-# remote-write calls will 404.
+# AMW_REMOTE_WRITE_URL = DCE.logs_ingestion_endpoint + /dataCollectionRules/
+# DCR.immutable_id + /streams/Microsoft-PrometheusMetrics/api/v1/write. Both
+# halves come from the landing-zone managed-monitoring component
+# (`terragrunt output amw_remote_write_url`). Update this whenever the DCE
+# or DCR is recreated — the immutable_id changes on replacement.
 
 serviceAccount:
   annotations:
@@ -14,7 +12,7 @@ serviceAccount:
 
 extraEnv:
   - name: AMW_REMOTE_WRITE_URL
-    value: "https://prod-aks-amw-chhnb2fxgjg8g7aw.westus2.prometheus.monitor.azure.com/dataCollectionRules/.../streams/Microsoft-PrometheusMetrics/api/v1/write"
+    value: "https://prod-aks-amw-dce-4vpk.westus2-1.ingest.monitor.azure.com/dataCollectionRules/dcr-b8d36469219f4998bc0a933eac390cfe/streams/Microsoft-PrometheusMetrics/api/v1/write"
   - name: CLUSTER_NAME
     value: "prod-aks"
 
