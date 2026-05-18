@@ -2,7 +2,7 @@
 
 ## Overview
 
-AKS-specific GitOps configuration for ArgoCD addon lifecycle management. Part of a multi-cloud strategy (`eks-gitops`, `gke-gitops`, `aks-gitops`). Companion to [azure-aks](https://github.com/stxkxs/azure-aks) (Bicep/Terraform infrastructure).
+AKS-specific GitOps configuration for ArgoCD addon lifecycle management. Part of a multi-cloud strategy (`eks-gitops`, `gke-gitops`, `aks-gitops`). Companion to [azure-aks](https://github.com/nanohype/azure-aks) (Bicep/Terraform infrastructure).
 
 ## Directory Structure
 

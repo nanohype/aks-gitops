@@ -2,7 +2,7 @@
 
 ## GitOps Model
 
-This repository implements the **App-of-Apps** pattern for ArgoCD. It is the AKS variant of a multi-cloud GitOps strategy (`eks-gitops`, `gke-gitops`, `aks-gitops`). The IaC infrastructure ([azure-aks](https://github.com/stxkxs/azure-aks)) deploys ArgoCD and creates a root Application that points to this repository's `applicationsets/` directory.
+This repository implements the **App-of-Apps** pattern for ArgoCD. It is the AKS variant of a multi-cloud GitOps strategy (`eks-gitops`, `gke-gitops`, `aks-gitops`). The IaC infrastructure ([azure-aks](https://github.com/nanohype/azure-aks)) deploys ArgoCD and creates a root Application that points to this repository's `applicationsets/` directory.
 
 ```mermaid
 graph TD
@@ -38,7 +38,7 @@ sources:
       valueFiles:
         - $values/{{ .path }}/values.yaml
         - $values/{{ .path }}/values-{{ index .metadata.labels "environment" }}.yaml
-  - repoURL: https://github.com/stxkxs/aks-gitops.git
+  - repoURL: https://github.com/nanohype/aks-gitops.git
     targetRevision: main
     ref: values
 ```
@@ -46,7 +46,7 @@ sources:
 **Kustomize addons** use single-source with environment-specific overlay paths:
 ```yaml
 source:
-  repoURL: https://github.com/stxkxs/aks-gitops.git
+  repoURL: https://github.com/nanohype/aks-gitops.git
   targetRevision: main
   path: '{{ .path }}/overlays/{{ index .metadata.labels "environment" }}'
 ```
