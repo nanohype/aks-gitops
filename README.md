@@ -13,7 +13,7 @@ GitOps configuration for AKS cluster addons, managed by ArgoCD. Part of a multi-
 
 ## Companion Repository
 
-This repository is the AKS variant of a multi-cloud GitOps strategy. Infrastructure is provisioned by [azure-aks](https://github.com/stxkxs/azure-aks) (Bicep/Terraform), which deploys ArgoCD and creates the App-of-Apps Application pointing to this repository.
+This repository is the AKS variant of a multi-cloud GitOps strategy. Infrastructure is provisioned by [azure-aks](https://github.com/nanohype/azure-aks) (Bicep/Terraform), which deploys ArgoCD and creates the App-of-Apps Application pointing to this repository.
 
 ## Architecture
 

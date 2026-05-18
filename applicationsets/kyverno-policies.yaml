@@ -31,7 +31,7 @@ spec:
     spec:
       project: platform
       source:
-        repoURL: https://github.com/stxkxs/aks-gitops.git
+        repoURL: https://github.com/nanohype/aks-gitops.git
         targetRevision: main
         path: '{{ .path }}/overlays/{{ index .metadata.labels "environment" }}'
       destination:
